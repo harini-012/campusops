@@ -1,0 +1,10 @@
+require('node:dns').setServers(['8.8.8.8', '1.1.1.1']);
+require('dotenv').config();
+const mongoose=require('mongoose'),bcrypt=require('bcryptjs');
+const {User,Room}=require('./index').models;
+(async()=>{await mongoose.connect(process.env.MONGO_URI);
+const pw=await bcrypt.hash('password123',10);
+const us=[['Super Admin','admin','sa'],['Dr. Meena','campus','ca'],['Prof. Ravi','hod','hod','CSE'],['Ms. Kavya','faculty','fac','CSE'],['Arjun','student','stu','CSE'],['Mr. Selvam','security','sec'],['Mr. Kumar','maint','mnt'],['Ms. Anitha','event','evc','CSE']];
+for(const [name,m,role,dept] of us)await User.updateOne({email:m+'@c.edu'},{name,email:m+'@c.edu',password:pw,role,dept},{upsert:true});
+if(!await Room.countDocuments())await Room.insertMany([{no:'A-101',type:'Classroom',floor:1,capacity:60,facilities:['Smart Board','Projector','Wi-Fi'],schedule:[{day:1,start:'09:00',end:'10:00'}]},{no:'LAB-1',type:'Laboratory',floor:1,capacity:30,facilities:['Computers','Wi-Fi','AC'],schedule:[]}]);
+console.log('Seeded');process.exit()})();
